@@ -156,6 +156,21 @@ endef
 $(eval $(call KernelPackage,dma-buf))
 
 
+define KernelPackage/nvmem
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Non Volatile Memory support
+  DEPENDS:=@LINUX_4_19
+  KCONFIG:=CONFIG_NVMEM
+  HIDDEN:=1
+  FILES:=$(LINUX_DIR)/drivers/nvmem/nvmem_core.ko
+endef
+
+define KernelPackage/nvmem/description
+  Support for NVMEM(Non Volatile Memory) devices like EEPROM, EFUSES, etc.
+endef
+
+$(eval $(call KernelPackage,nvmem))
+
 define KernelPackage/eeprom-93cx6
   SUBMENU:=$(OTHER_MENU)
   TITLE:=EEPROM 93CX6 support
@@ -175,7 +190,7 @@ define KernelPackage/eeprom-at24
   SUBMENU:=$(OTHER_MENU)
   TITLE:=EEPROM AT24 support
   KCONFIG:=CONFIG_EEPROM_AT24
-  DEPENDS:=+kmod-i2c-core +kmod-regmap-i2c
+  DEPENDS:=+kmod-i2c-core +LINUX_4_19:kmod-nvmem +kmod-regmap-i2c
   FILES:=$(LINUX_DIR)/drivers/misc/eeprom/at24.ko
   AUTOLOAD:=$(call AutoProbe,at24)
 endef
@@ -191,6 +206,7 @@ define KernelPackage/eeprom-at25
   SUBMENU:=$(OTHER_MENU)
   TITLE:=EEPROM AT25 support
   KCONFIG:=CONFIG_EEPROM_AT25
+  DEPENDS:=+LINUX_4_19:kmod-nvmem
   FILES:=$(LINUX_DIR)/drivers/misc/eeprom/at25.ko
   AUTOLOAD:=$(call AutoProbe,at25)
 endef
@@ -316,6 +332,11 @@ $(eval $(call KernelPackage,mlxreg-lc))
 
 define KernelPackage/mlxreg-sn2201
   SUBMENU:=$(OTHER_MENU)
+  DEPENDS:=@GPIO_SUPPORT +kmod-i2c-core +!LINUX_4_19:kmod-regmap-i2c
+  TITLE:=PCA95xx, TCA64xx, and MAX7310 I/O ports
+  KCONFIG:=CONFIG_GPIO_PCA953X
+  FILES:=$(LINUX_DIR)/drivers/gpio/gpio-pca953x.ko
+  AUTOLOAD:=$(call AutoLoad,55,gpio-pca953x)
   TITLE:=Nvidia SN2201 platform support
   DEPENDS:=kmod-mlxreg +kmod-regmap-i2c
   KCONFIG:=CONFIG_NVSW_SN2201
@@ -581,6 +602,191 @@ define KernelPackage/mfd
   AUTOLOAD:=$(call AutoLoad,10,mfd-core)
 endef
 
+define KernelPackage/rtc-ds1307/description
+ Kernel module for Dallas/Maxim DS1307/DS1337/DS1338/DS1340/DS1388/DS3231,
+ Epson RX-8025 and various other compatible RTC chips connected via I2C.
+endef
+
+$(eval $(call KernelPackage,rtc-ds1307))
+
+
+define KernelPackage/rtc-ds1374
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Dallas/Maxim DS1374 RTC support
+  DEFAULT:=m if ALL_KMODS && RTC_SUPPORT
+  DEPENDS:=+kmod-i2c-core
+  KCONFIG:=CONFIG_RTC_DRV_DS1374 \
+	CONFIG_RTC_DRV_DS1374_WDT=n \
+	CONFIG_RTC_CLASS=y
+  FILES:=$(LINUX_DIR)/drivers/rtc/rtc-ds1374.ko
+  AUTOLOAD:=$(call AutoProbe,rtc-ds1374)
+endef
+
+define KernelPackage/rtc-ds1374/description
+ Kernel module for Dallas/Maxim DS1374.
+endef
+
+$(eval $(call KernelPackage,rtc-ds1374))
+
+
+define KernelPackage/rtc-ds1672
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Dallas/Maxim DS1672 RTC support
+  DEFAULT:=m if ALL_KMODS && RTC_SUPPORT
+  DEPENDS:=+kmod-i2c-core
+  KCONFIG:=CONFIG_RTC_DRV_DS1672 \
+	CONFIG_RTC_CLASS=y
+  FILES:=$(LINUX_DIR)/drivers/rtc/rtc-ds1672.ko
+  AUTOLOAD:=$(call AutoProbe,rtc-ds1672)
+endef
+
+define KernelPackage/rtc-ds1672/description
+ Kernel module for Dallas/Maxim DS1672 RTC.
+endef
+
+$(eval $(call KernelPackage,rtc-ds1672))
+
+
+define KernelPackage/rtc-em3027
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Microelectronic EM3027 RTC support
+  DEFAULT:=m if ALL_KMODS && RTC_SUPPORT
+  DEPENDS:=+kmod-i2c-core
+  KCONFIG:=CONFIG_RTC_DRV_EM3027 \
+	CONFIG_RTC_CLASS=y
+  FILES:=$(LINUX_DIR)/drivers/rtc/rtc-em3027.ko
+  AUTOLOAD:=$(call AutoProbe,rtc-em3027)
+endef
+
+define KernelPackage/rtc-em3027/description
+ Kernel module for Microelectronic EM3027 RTC.
+endef
+
+$(eval $(call KernelPackage,rtc-em3027))
+
+
+define KernelPackage/rtc-isl1208
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Intersil ISL1208 RTC support
+  DEFAULT:=m if ALL_KMODS && RTC_SUPPORT
+  DEPENDS:=+kmod-i2c-core
+  KCONFIG:=CONFIG_RTC_DRV_ISL1208 \
+	CONFIG_RTC_CLASS=y
+  FILES:=$(LINUX_DIR)/drivers/rtc/rtc-isl1208.ko
+  AUTOLOAD:=$(call AutoProbe,rtc-isl1208)
+endef
+
+define KernelPackage/rtc-isl1208/description
+ Kernel module for Intersil ISL1208 RTC.
+endef
+
+$(eval $(call KernelPackage,rtc-isl1208))
+
+
+define KernelPackage/rtc-pcf8563
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Philips PCF8563/Epson RTC8564 RTC support
+  DEFAULT:=m if ALL_KMODS && RTC_SUPPORT
+  DEPENDS:=+kmod-i2c-core
+  KCONFIG:=CONFIG_RTC_DRV_PCF8563 \
+	CONFIG_RTC_CLASS=y
+  FILES:=$(LINUX_DIR)/drivers/rtc/rtc-pcf8563.ko
+  AUTOLOAD:=$(call AutoProbe,rtc-pcf8563)
+endef
+
+define KernelPackage/rtc-pcf8563/description
+ Kernel module for Philips PCF8563 RTC chip.
+ The Epson RTC8564 should work as well.
+endef
+
+$(eval $(call KernelPackage,rtc-pcf8563))
+
+
+define KernelPackage/rtc-pcf2123
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Philips PCF2123 RTC support
+  DEFAULT:=m if ALL_KMODS && RTC_SUPPORT
+  DEPENDS:=+!LINUX_4_19:kmod-regmap-spi
+  KCONFIG:=CONFIG_RTC_DRV_PCF2123 \
+	CONFIG_RTC_CLASS=y
+  FILES:=$(LINUX_DIR)/drivers/rtc/rtc-pcf2123.ko
+  AUTOLOAD:=$(call AutoProbe,rtc-pcf2123)
+endef
+
+define KernelPackage/rtc-pcf2123/description
+ Kernel module for Philips PCF2123 RTC chip
+endef
+
+$(eval $(call KernelPackage,rtc-pcf2123))
+
+define KernelPackage/rtc-pcf2127
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=NXP PCF2127 and PCF2129 RTC support
+  DEFAULT:=m if ALL_KMODS && RTC_SUPPORT
+  DEPENDS:=+kmod-i2c-core +!LINUX_4_19:kmod-regmap-spi
+  KCONFIG:=CONFIG_RTC_DRV_PCF2127 \
+	CONFIG_RTC_CLASS=y
+  FILES:=$(LINUX_DIR)/drivers/rtc/rtc-pcf2127.ko
+  AUTOLOAD:=$(call AutoProbe,rtc-pcf2127)
+endef
+
+define KernelPackage/rtc-pcf2127/description
+ Kernel module for NXP PCF2127 and PCF2129 RTC chip
+endef
+
+$(eval $(call KernelPackage,rtc-pcf2127))
+
+
+define KernelPackage/rtc-rs5c372a
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Ricoh R2025S/D, RS5C372A/B, RV5C386, RV5C387A
+  DEFAULT:=m if ALL_KMODS && RTC_SUPPORT
+  DEPENDS:=+kmod-i2c-core
+  KCONFIG:=CONFIG_RTC_DRV_RS5C372 \
+	CONFIG_RTC_CLASS=y
+  FILES:=$(LINUX_DIR)/drivers/rtc/rtc-rs5c372.ko
+  AUTOLOAD:=$(call AutoLoad,50,rtc-rs5c372,1)
+endef
+
+define KernelPackage/rtc-rs5c372a/description
+ Kernel module for Ricoh R2025S/D, RS5C372A/B, RV5C386, RV5C387A RTC on chip module
+endef
+
+$(eval $(call KernelPackage,rtc-rs5c372a))
+
+define KernelPackage/rtc-rx8025
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Epson RX-8025 / RX-8035
+  DEFAULT:=m if ALL_KMODS && RTC_SUPPORT
+  DEPENDS:=+kmod-i2c-core
+  KCONFIG:=CONFIG_RTC_DRV_RX8025 \
+	CONFIG_RTC_CLASS=y
+  FILES:=$(LINUX_DIR)/drivers/rtc/rtc-rx8025.ko
+  AUTOLOAD:=$(call AutoLoad,50,rtc-rx8025,1)
+endef
+
+define KernelPackage/rtc-rx8025/description
+ Kernel module for Epson RX-8025 and RX-8035 I2C RTC chip
+endef
+
+$(eval $(call KernelPackage,rtc-rx8025))
+
+define KernelPackage/rtc-s35390a
+  SUBMENU:=$(OTHER_MENU)
+  TITLE:=Seico S-35390A
+  DEFAULT:=m if ALL_KMODS && RTC_SUPPORT
+  DEPENDS:=+kmod-i2c-core
+  KCONFIG:=CONFIG_RTC_DRV_S35390A \
+	CONFIG_RTC_CLASS=y
+  FILES:=$(LINUX_DIR)/drivers/rtc/rtc-s35390a.ko
+  AUTOLOAD:=$(call AutoLoad,50,rtc-s35390a,1)
+endef
+
+define KernelPackage/rtc-s35390a/description
+ Kernel module for Seiko Instruments S-35390A I2C RTC chip
+endef
+
+$(eval $(call KernelPackage,rtc-s35390a))
 $(eval $(call KernelPackage,mfd))
 
 

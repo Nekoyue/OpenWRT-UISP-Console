@@ -314,17 +314,6 @@ endef
 $(eval $(call KernelPackage,sound-soc-spdif))
 
 
-define KernelPackage/sound-soc-dmic
-  TITLE:=Generic Digital Microphone CODEC
-  KCONFIG:=CONFIG_SND_SOC_DMIC
-  FILES:=$(LINUX_DIR)/sound/soc/codecs/snd-soc-dmic.ko
-  AUTOLOAD:=$(call AutoProbe,snd-soc-dmic)
-  $(call AddDepends/sound,+kmod-sound-soc-core)
-endef
-
-$(eval $(call KernelPackage,sound-soc-dmic))
-
-
 define KernelPackage/pcspkr
   DEPENDS:=@TARGET_x86 +kmod-input-core
   TITLE:=PC speaker support
@@ -580,7 +569,8 @@ define KernelPackage/sound-hda-intel
 	CONFIG_SND_HDA_INTEL
   FILES:= \
 	$(LINUX_DIR)/sound/pci/hda/snd-hda-intel.ko \
-	$(LINUX_DIR)/sound/hda/snd-intel-dspcfg.ko
+	$(LINUX_DIR)/sound/hda/snd-intel-nhlt.ko@lt5.5 \
+	$(LINUX_DIR)/sound/hda/snd-intel-dspcfg.ko@ge5.5
   AUTOLOAD:=$(call AutoProbe,snd-hda-intel)
   $(call AddDepends/sound,kmod-sound-hda-core)
 endef

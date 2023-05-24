@@ -1096,8 +1096,9 @@ $(eval $(call KernelPackage,igbvf))
 define KernelPackage/ixgbe
   SUBMENU:=$(NETWORK_DEVICES_MENU)
   TITLE:=Intel(R) 82598/82599 PCI-Express 10 Gigabit Ethernet support
-  DEPENDS:=@PCI_SUPPORT +kmod-mdio +kmod-ptp +kmod-hwmon-core +kmod-libphy +kmod-mdio-devres
+  DEPENDS:=@PCI_SUPPORT +kmod-mdio +kmod-ptp +kmod-hwmon-core +!LINUX_4_19:kmod-libphy +kmod-mdio-devres
   KCONFIG:=CONFIG_IXGBE \
+    CONFIG_IXGBE_VXLAN=n \
     CONFIG_IXGBE_HWMON=y \
     CONFIG_IXGBE_DCA=n
   FILES:=$(LINUX_DIR)/drivers/net/ethernet/intel/ixgbe/ixgbe.ko
@@ -1116,6 +1117,7 @@ define KernelPackage/ixgbevf
   TITLE:=Intel(R) 82599 Virtual Function Ethernet support
   DEPENDS:=@PCI_SUPPORT +kmod-ixgbe
   KCONFIG:=CONFIG_IXGBEVF \
+    CONFIG_IXGBE_VXLAN=n \
     CONFIG_IXGBE_HWMON=y \
     CONFIG_IXGBE_DCA=n
   FILES:=$(LINUX_DIR)/drivers/net/ethernet/intel/ixgbevf/ixgbevf.ko
@@ -1132,8 +1134,10 @@ $(eval $(call KernelPackage,ixgbevf))
 define KernelPackage/i40e
   SUBMENU:=$(NETWORK_DEVICES_MENU)
   TITLE:=Intel(R) Ethernet Controller XL710 Family support
-  DEPENDS:=@PCI_SUPPORT +kmod-ptp
+  DEPENDS:=@PCI_SUPPORT +kmod-mdio +kmod-ptp +kmod-hwmon-core +!LINUX_4_19:kmod-libphy
   KCONFIG:=CONFIG_I40E \
+    CONFIG_I40E_VXLAN=n \
+    CONFIG_I40E_HWMON=y \
     CONFIG_I40E_DCA=n
   FILES:=$(LINUX_DIR)/drivers/net/ethernet/intel/i40e/i40e.ko
   AUTOLOAD:=$(call AutoProbe,i40e)
@@ -1154,7 +1158,8 @@ define KernelPackage/iavf
        CONFIG_I40EVF \
        CONFIG_IAVF
   FILES:= \
-       $(LINUX_DIR)/drivers/net/ethernet/intel/iavf/iavf.ko
+       $(LINUX_DIR)/drivers/net/ethernet/intel/i40evf/i40evf.ko@lt4.20 \
+       $(LINUX_DIR)/drivers/net/ethernet/intel/iavf/iavf.ko@ge4.20
   AUTOLOAD:=$(call AutoProbe,i40evf iavf)
   AUTOLOAD:=$(call AutoProbe,iavf)
 endef
@@ -1271,6 +1276,36 @@ define KernelPackage/hfcmulti/description
 endef
 
 $(eval $(call KernelPackage,hfcmulti))
+
+
+define KernelPackage/gigaset
+  SUBMENU:=$(NETWORK_DEVICES_MENU)
+  TITLE:=Siemens Gigaset support for isdn4linux
+  DEPENDS:=@USB_SUPPORT +kmod-isdn4linux +kmod-lib-crc-ccitt +kmod-usb-core @LINUX_4_19
+  URL:=http://gigaset307x.sourceforge.net/
+  KCONFIG:= \
+    CONFIG_ISDN_DRV_GIGASET \
+    CONFIG_GIGASET_BASE \
+    CONFIG_GIGASET_M101 \
+    CONFIG_GIGASET_M105 \
+    CONFIG_GIGASET_UNDOCREQ=y \
+    CONFIG_GIGASET_I4L=y
+  FILES:= \
+    $(LINUX_DIR)/drivers/isdn/gigaset/gigaset.ko \
+    $(LINUX_DIR)/drivers/isdn/gigaset/bas_gigaset.ko \
+    $(LINUX_DIR)/drivers/isdn/gigaset/ser_gigaset.ko \
+    $(LINUX_DIR)/drivers/isdn/gigaset/usb_gigaset.ko
+  AUTOLOAD:=$(call AutoProbe,gigaset bas_gigaset ser_gigaset usb_gigaset)
+endef
+
+define KernelPackage/gigaset/description
+ This driver supports the Siemens Gigaset SX205/255 family of
+ ISDN DECT bases, including the predecessors Gigaset 3070/3075
+ and 4170/4175 and their T-Com versions Sinus 45isdn and Sinus
+ 721X.
+endef
+
+$(eval $(call KernelPackage,gigaset))
 
 
 define KernelPackage/macvlan
@@ -1831,7 +1866,7 @@ $(eval $(call KernelPackage,stmmac-core))
 define KernelPackage/igc
   SUBMENU:=$(NETWORK_DEVICES_MENU)
   TITLE:=Intel(R) Ethernet Controller I225 Series support
-  DEPENDS:=@PCI_SUPPORT +kmod-ptp
+  DEPENDS:=@PCI_SUPPORT @!LINUX_4_19 +kmod-ptp
   KCONFIG:=CONFIG_IGC
   FILES:=$(LINUX_DIR)/drivers/net/ethernet/intel/igc/igc.ko
   AUTOLOAD:=$(call AutoLoad,34,igc,1)
