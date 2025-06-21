@@ -1,3 +1,100 @@
+Credits:
+- UISP Console 之创 - https://nyac.at/posts/uisp-console-chuang
+- 给 UISP Console 适配 OpenWRT - https://nyac.at/posts/uisp-openwrt
+
+# OpenWRT for OpenWRT console
+
+## Build OpenWRT
+Install build tools for your OS: https://openwrt.org/docs/guide-developer/toolchain/install-buildsystem
+
+Clone this repo.
+
+Then follow OpenWRT's build guide: https://openwrt.org/docs/guide-developer/toolchain/use-buildsystem#menuconfig
+```shell
+./scripts/feeds update -a
+./scripts/feeds install -a
+
+# Select:
+# Target System - UISP Console
+# Base system - swconfig
+# LuCI
+make menuconfig  
+
+make -j$(nproc) defconfig download clean world
+```
+
+The image will be built at 
+`./build_dir/target-aarch64_cortex-a57_musl/linux-uispconsole_/root.ext4`.
+
+## Flash to SSD
+TODO: driver for rtl8370mb is broken rn, i.e. port 1-8 is currently unavailable.
+
+TTL/SSH into the device (default login: type `ubnt` + enter twice). Use scp to upload root.ext4 to the UISP console (e.g. /mnt/persistent). 
+Then:
+
+```shell
+dd if=root.ext4 of=/dev/sda1 bs=4M
+```
+
+## Boot into OpenWRT
+Connect to TTL. Press Esc when booting to enter uboot bootloader, run:
+
+```shell
+setenv rootargs root=/dev/sda1 rw rootwait
+setenv bootargs $rootargs pci=pcie_bus_perf console=ttyS0,115200 panic=3 init=/sbin/init
+ext4load usb 0 0x08000004 uImage.1
+rtl83xx
+bootm 0x08000004
+```
+
+To permanently boot from openwrt:
+```shell
+setenv rootargs root=/dev/sda1 rw rootwait
+setenv bootargs $rootargs pci=pcie_bus_perf console=ttyS0,115200 panic=3 init=/sbin/init
+setenv bootcmd 'rtl83xx; ext4load usb 0 0x08000004 uImage.1; bootm 0x08000004'
+saveenv
+```
+
+## kexec (TODO)
+Kernel module signing seems to be required in `4.19.152-al-linux-v10.2.0-v5.1.0`. Unable to load kexec module.
+```
+insmod: ERROR: could not insert module kexec_mod_arm64.ko: Required key not available
+```
+
+```shell
+git clone https://github.com/fabianishere/kexec-mod.git
+cd kexec-mod
+scp ubnt@ubnt.lan:/proc/config.gz .
+gunzip config.gz
+
+git clone https://github.com/fabianishere/udm-kernel.git
+cd udm-kernel
+# v1.10.4
+git checkout 89130462d8a36d535c1d0ce50a7a153ad1587865
+
+cp ../config .config
+export ARCH=arm64
+make olddefconfig LOCALVERSION=
+make modules_prepare LOCALVERSION=    
+
+cd ../kernel
+make KDIR=$(pwd)/udm-kernel
+scp *.ko ubnt@ubnt.lan:/mnt/persistent
+
+cd ../user
+make
+scp redir.so ubnt@ubnt.lan:/mnt/persistent
+```
+
+```shell
+insmod kexec_mod_arm64.ko shim_hyp=1
+insmod kexec_mod.ko
+export LD_PRELOAD=./redir.so
+kexec -l /boot/Image --reuse-cmdline
+kexec -e
+```
+
+
 ![OpenWrt logo](include/logo.png)
 
 OpenWrt Project is a Linux operating system targeting embedded devices. Instead
