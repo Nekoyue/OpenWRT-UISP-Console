@@ -181,19 +181,11 @@ typedef enum rtk_switch_maxPktLen_linkSpeed_e {
 	for ((__portmask__).bits[0] = 0; (__portmask__).bits[0] < 0x7FFFF; (__portmask__).bits[0]++) \
 		if (rtk_switch_isPortMaskValid(&__portmask__) == RT_ERR_OK)
 
-<<<<<<<< HEAD:target/linux/mediatek/files/drivers/net/phy/rtk/rtl8367c/include/rtk_switch.h
-/* Port mask definition */
-#define RTK_PHY_PORTMASK_ALL                                (rtk_switch_phyPortMask_get())
-
-/* Port definition*/
-#define RTK_MAX_LOGICAL_PORT_ID                             (rtk_switch_maxLogicalPort_get())
-========
 /* Port mask defination */
 #define RTK_PHY_PORTMASK_ALL (rtk_switch_phyPortMask_get())
 
 /* Port defination*/
 #define RTK_MAX_LOGICAL_PORT_ID (rtk_switch_maxLogicalPort_get())
->>>>>>>> c6439b4f2b (can run):target/linux/uispconsole/files-4.19/drivers/net/phy/rtl83xx_api/rtk_switch.h
 
 /* Function Name:
  *      rtk_switch_probe
@@ -481,7 +473,7 @@ extern rtk_api_ret_t rtk_switch_isPortMaskExt(rtk_portmask_t *pPmask);
 /* Function Name:
  *      rtk_switch_portmask_L2P_get
  * Description:
- *      Get physical portmask from logical portmask
+ *      Get physicl portmask from logical portmask
  * Input:
  *      pLogicalPmask       - logical port mask
  * Output:
@@ -550,7 +542,7 @@ rtk_api_ret_t rtk_switch_logPortMask_get(rtk_portmask_t *pPortmask);
 /* Function Name:
  *      rtk_switch_init
  * Description:
- *      Set chip to default configuration environment
+ *      Set chip to default configuration enviroment
  * Input:
  *      None
  * Output:

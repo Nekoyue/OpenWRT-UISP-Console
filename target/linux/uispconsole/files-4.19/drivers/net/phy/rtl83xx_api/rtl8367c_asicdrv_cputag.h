@@ -20,13 +20,8 @@ extern ret_t rtl8367c_setAsicCputagInsertMode(rtk_uint32 mode);
 extern ret_t rtl8367c_getAsicCputagInsertMode(rtk_uint32 *pMode);
 extern ret_t rtl8367c_setAsicCputagPriorityRemapping(rtk_uint32 srcPri, rtk_uint32 newPri);
 extern ret_t rtl8367c_getAsicCputagPriorityRemapping(rtk_uint32 srcPri, rtk_uint32 *pNewPri);
-<<<<<<<< HEAD:target/linux/mediatek/files/drivers/net/phy/rtk/rtl8367c/include/rtl8367c_asicdrv_cputag.h
-extern ret_t rtl8367c_setAsicCputagPosition(rtk_uint32 position);
-extern ret_t rtl8367c_getAsicCputagPosition(rtk_uint32* pPostion);
-========
 extern ret_t rtl8367c_setAsicCputagPosition(rtk_uint32 postion);
 extern ret_t rtl8367c_getAsicCputagPosition(rtk_uint32 *pPostion);
->>>>>>>> c6439b4f2b (can run):target/linux/uispconsole/files-4.19/drivers/net/phy/rtl83xx_api/rtl8367c_asicdrv_cputag.h
 extern ret_t rtl8367c_setAsicCputagMode(rtk_uint32 mode);
 extern ret_t rtl8367c_getAsicCputagMode(rtk_uint32 *pMode);
 extern ret_t rtl8367c_setAsicCputagRxMinLength(rtk_uint32 mode);

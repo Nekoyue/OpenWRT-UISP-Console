@@ -13,7 +13,7 @@
  * $Date: 2017-03-08 15:13:58 +0800 (週三, 08 三月 2017) $
  *
  * Purpose : RTL8367C switch high-level API for RTL8367C
- * Feature : Unknown multicast related functions
+ * Feature : Unkown multicast related functions
  *
  */
 #include <rtl8367c_asicdrv_unknownMulticast.h>

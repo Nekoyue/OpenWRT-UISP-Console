@@ -1329,8 +1329,6 @@ case $cpu-$vendor in
 			| le32 \
 			| le64 \
 			| lm32 \
-			| loongarch32 \
-			| loongarch64 \
 			| m32c \
 			| m32r \
 			| m32rle \

@@ -1,23 +1,3 @@
-<<<<<<<< HEAD:target/linux/mediatek/files/drivers/net/phy/rtk/rtl8367c/include/rtl8367c_asicdrv_qos.h
-/*
- * Copyright (C) 2013 Realtek Semiconductor Corp.
- * All Rights Reserved.
- *
- * Unless you and Realtek execute a separate written software license
- * agreement governing use of this software, this software is licensed
- * to you under the terms of the GNU General Public License version 2,
- * available at https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
- *
- * $Revision: 76306 $
- * $Date: 2017-03-08 15:13:58 +0800 (¶g¤T, 08 ¤T¤ë 2017) $
- *
- * Purpose : RTL8367C switch high-level API for RTL8367C
- * Feature : QoS related functions
- *
- */
-
-========
->>>>>>>> c6439b4f2b (can run):target/linux/uispconsole/files-4.19/drivers/net/phy/rtl83xx_api/rtl8367c_asicdrv_qos.h
 #ifndef _RTL8367C_ASICDRV_QOS_H_
 #define _RTL8367C_ASICDRV_QOS_H_
 

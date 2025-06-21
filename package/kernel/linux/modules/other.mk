@@ -602,14 +602,6 @@ define KernelPackage/mfd
   AUTOLOAD:=$(call AutoLoad,10,mfd-core)
 endef
 
-define KernelPackage/rtc-ds1307/description
- Kernel module for Dallas/Maxim DS1307/DS1337/DS1338/DS1340/DS1388/DS3231,
- Epson RX-8025 and various other compatible RTC chips connected via I2C.
-endef
-
-$(eval $(call KernelPackage,rtc-ds1307))
-
-
 define KernelPackage/rtc-ds1374
   SUBMENU:=$(OTHER_MENU)
   TITLE:=Dallas/Maxim DS1374 RTC support

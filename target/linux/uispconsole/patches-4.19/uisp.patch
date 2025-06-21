@@ -592,13 +592,13 @@
 --- a/drivers/ata/ahci.h
 +++ b/drivers/ata/ahci.h
 @@ -240,6 +240,7 @@ enum {
- 						        error-handling stage) */
- 	AHCI_HFLAG_NO_DEVSLP		= (1 << 17), /* no device sleep */
- 	AHCI_HFLAG_NO_FBS		= (1 << 18), /* no FBS */
-+	AHCI_HFLAG_AL_MSIX		= (1 << 19), /* alpine msix */
+						      error-handling stage) */
+	AHCI_HFLAG_NO_DEVSLP		= BIT(17), /* no device sleep */
+	AHCI_HFLAG_NO_FBS		= BIT(18), /* no FBS */
++	AHCI_HFLAG_AL_MSIX		= BIT(19), /* alpine msix */
  
  #ifdef CONFIG_PCI_MSI
- 	AHCI_HFLAG_MULTI_MSI		= (1 << 20), /* per-port MSI(-X) */
+ 	AHCI_HFLAG_MULTI_MSI		= BIT(20), /* per-port MSI(-X) */
 @@ -380,6 +381,9 @@ struct ahci_host_priv {
  	/* only required for per-port MSI(-X) support */
  	int			(*get_irq_vector)(struct ata_host *host,
@@ -1085,22 +1085,22 @@
  static ssize_t ahci_transmit_led_message(struct ata_port *ap, u32 state,
  					ssize_t size)
  {
-@@ -1915,6 +2215,7 @@ static irqreturn_t ahci_multi_irqs_intr_
+@@ -1926,6 +2226,7 @@ static irqreturn_t ahci_multi_irqs_intr_hard(int irq, void *dev_instance)
  	struct ata_port *ap = dev_instance;
  	void __iomem *port_mmio = ahci_port_base(ap);
  	u32 status;
 +	struct ata_host *host = ap->host;
  
- 	VPRINTK("ENTER\n");
- 
-@@ -1927,6 +2228,12 @@ static irqreturn_t ahci_multi_irqs_intr_
- 
- 	VPRINTK("EXIT\n");
+ 	status = readl(port_mmio + PORT_IRQ_STAT);
+ 	writel(status, port_mmio + PORT_IRQ_STAT);
+@@ -1934,6 +2234,12 @@ static irqreturn_t ahci_multi_irqs_intr_hard(int irq, void *dev_instance)
+ 	ahci_handle_port_interrupt(ap, port_mmio, status);
+ 	spin_unlock(ap->lock);
  
 +	if (al_ahci_enabled()) {
-+		spin_lock(&host->lock);
-+		alpine_clean_cause(ap);
-+		spin_unlock(&host->lock);
++ 		spin_lock(&host->lock);
++ 		alpine_clean_cause(ap);
++ 		spin_unlock(&host->lock);
 +	}
 +
  	return IRQ_HANDLED;
@@ -3298,11 +3298,11 @@
 --- a/include/linux/netdevice.h
 +++ b/include/linux/netdevice.h
 @@ -186,6 +186,9 @@ struct net_device_stats {
- 	unsigned long	tx_window_errors;
- 	unsigned long	rx_compressed;
- 	unsigned long	tx_compressed;
+ 	NET_DEV_STAT(tx_window_errors);
+ 	NET_DEV_STAT(rx_compressed);
+ 	NET_DEV_STAT(tx_compressed);
 +#ifdef CONFIG_LLDP_RX_DROP_COUNTER
-+	unsigned long	rx_lldp_dropped;
++	NET_DEV_STAT(rx_lldp_dropped);
 +#endif
  };
  
@@ -6297,7 +6297,7 @@
 +	if (br_handle_entry_hook)
 +		br_handle_entry_hook(NULL, (void *)f, BR_FDB_ENTRY_DEL, NULL);
 +
- 	if (f->is_static)
+ 	if (test_bit(BR_FDB_STATIC, &f->flags))
  		fdb_del_hw_addr(br, f->key.addr.addr);
  
 @@ -505,6 +508,7 @@ static struct net_bridge_fdb_entry *fdb_
@@ -6337,7 +6337,7 @@
  	fdb = fdb_find_rcu(&br->fdb_hash_tbl, addr, vid);
  	if (likely(fdb)) {
  		/* attempt to update an entry for a local interface */
- 		if (unlikely(fdb->is_local)) {
+ 		if (unlikely(test_bit(BR_FDB_LOCAL, &fdb->flags))) {
 -			if (net_ratelimit())
 +			if (net_ratelimit()) {
 +				if (ubnt_loop_event)
@@ -6481,14 +6481,6 @@
  struct net_bridge_fdb_key {
  	mac_addr addr;
  	u16 vlan_id;
-@@ -188,6 +196,7 @@ struct net_bridge_fdb_entry {
- 	/* write-heavy members should not affect lookups */
- 	unsigned long			updated ____cacheline_aligned_in_smp;
- 	unsigned long			used;
-+	unsigned long			flags;
- 
- 	struct rcu_head			rcu;
- };
 @@ -546,8 +555,8 @@ int br_fdb_fillbuf(struct net_bridge *br
  		   unsigned long off);
  int br_fdb_insert(struct net_bridge *br, struct net_bridge_port *source,
@@ -7134,7 +7126,7 @@
 +
  	return rdev_del_station(rdev, dev, &params);
  }
- 
+
 --- a/net/wireless/wext-core.c
 +++ b/net/wireless/wext-core.c
 @@ -922,6 +922,7 @@ static int wireless_process_ioctl(struct
@@ -7142,7 +7134,7 @@
  	struct net_device *dev;
  	iw_handler	handler;
 +	struct ifreq *ifr = (struct ifreq *) iwr;
- 
+
  	/* Permissions are already checked in dev_ioctl() before calling us.
  	 * The copy_to/from_user() of ifr is also dealt with in there */
 @@ -956,6 +957,10 @@ static int wireless_process_ioctl(struct
@@ -7155,4 +7147,4 @@
 +
  	return -EOPNOTSUPP;
  }
- 
+

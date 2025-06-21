@@ -20,7 +20,7 @@
 /* Function Name:
  *      rtl8367c_setAsicCputagEnable
  * Description:
- *      Set CPU tag function enable/disable
+ *      Set cpu tag function enable/disable
  * Input:
  *      enabled - 1: enabled, 0: disabled
  * Output:
@@ -43,7 +43,7 @@ ret_t rtl8367c_setAsicCputagEnable(rtk_uint32 enabled)
 /* Function Name:
  *      rtl8367c_getAsicCputagEnable
  * Description:
- *      Get CPU tag function enable/disable
+ *      Get cpu tag function enable/disable
  * Input:
  *      pEnabled - 1: enabled, 0: disabled
  * Output:
@@ -61,7 +61,7 @@ ret_t rtl8367c_getAsicCputagEnable(rtk_uint32 *pEnabled)
 /* Function Name:
  *      rtl8367c_setAsicCputagTrapPort
  * Description:
- *      Set CPU tag trap port
+ *      Set cpu tag trap port
  * Input:
  *      port - port number
  * Output:
@@ -93,7 +93,7 @@ ret_t rtl8367c_setAsicCputagTrapPort(rtk_uint32 port)
 /* Function Name:
  *      rtl8367c_getAsicCputagTrapPort
  * Description:
- *      Get CPU tag trap port
+ *      Get cpu tag trap port
  * Input:
  *      pPort - port number
  * Output:
@@ -250,9 +250,9 @@ ret_t rtl8367c_getAsicCputagPriorityRemapping(rtk_uint32 srcPri, rtk_uint32 *pNe
 /* Function Name:
  *      rtl8367c_setAsicCputagPosition
  * Description:
- *      Set CPU tag insert position
+ *      Set cpu tag insert position
  * Input:
- *      position - 1: After entire packet(before CRC field), 0: After MAC_SA (Default)
+ *      postion - 1: After entire packet(before CRC field), 0: After MAC_SA (Default)
  * Output:
  *      None
  * Return:
@@ -261,18 +261,14 @@ ret_t rtl8367c_getAsicCputagPriorityRemapping(rtk_uint32 srcPri, rtk_uint32 *pNe
  * Note:
  *     None
  */
-ret_t rtl8367c_setAsicCputagPosition(rtk_uint32 position)
+ret_t rtl8367c_setAsicCputagPosition(rtk_uint32 postion)
 {
-<<<<<<<< HEAD:target/linux/mediatek/files/drivers/net/phy/rtk/rtl8367c/rtl8367c_asicdrv_cputag.c
-    return rtl8367c_setAsicRegBit(RTL8367C_REG_CPU_CTRL, RTL8367C_CPU_TAG_POSITION_OFFSET, position);
-========
 	return rtl8367c_setAsicRegBit(RTL8367C_REG_CPU_CTRL, RTL8367C_CPU_TAG_POSITION_OFFSET, postion);
->>>>>>>> c6439b4f2b (can run):target/linux/uispconsole/files-4.19/drivers/net/phy/rtl83xx_api/rtl8367c_asicdrv_cputag.c
 }
 /* Function Name:
  *      rtl8367c_getAsicCputagPosition
  * Description:
- *      Get CPU tag insert position
+ *      Get cpu tag insert position
  * Input:
  *      pPostion - 1: After entire packet(before CRC field), 0: After MAC_SA (Default)
  * Output:
@@ -291,7 +287,7 @@ ret_t rtl8367c_getAsicCputagPosition(rtk_uint32 *pPostion)
 /* Function Name:
  *      rtl8367c_setAsicCputagMode
  * Description:
- *      Set CPU tag mode
+ *      Set cpu tag mode
  * Input:
  *      mode - 1: 4bytes mode, 0: 8bytes mode
  * Output:
@@ -314,7 +310,7 @@ ret_t rtl8367c_setAsicCputagMode(rtk_uint32 mode)
 /* Function Name:
  *      rtl8367c_getAsicCputagMode
  * Description:
- *      Get CPU tag mode
+ *      Get cpu tag mode
  * Input:
  *      pMode - 1: 4bytes mode, 0: 8bytes mode
  * Output:
@@ -332,7 +328,7 @@ ret_t rtl8367c_getAsicCputagMode(rtk_uint32 *pMode)
 /* Function Name:
  *      rtl8367c_setAsicCputagRxMinLength
  * Description:
- *      Set CPU tag mode
+ *      Set cpu tag mode
  * Input:
  *      mode - 1: 64bytes, 0: 72bytes
  * Output:
@@ -355,7 +351,7 @@ ret_t rtl8367c_setAsicCputagRxMinLength(rtk_uint32 mode)
 /* Function Name:
  *      rtl8367c_getAsicCputagRxMinLength
  * Description:
- *      Get CPU tag mode
+ *      Get cpu tag mode
  * Input:
  *      pMode - 1: 64bytes, 0: 72bytes
  * Output:
